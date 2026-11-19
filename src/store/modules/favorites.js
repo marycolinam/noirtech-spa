@@ -1,8 +1,12 @@
+import { loadFromStorage } from "@/utils/storage";
+
+export const FAVORITES_KEY = "noirtech_favorites";
+
 export default {
   namespaced: true,
 
   state: () => ({
-    items: [],
+    items: loadFromStorage(FAVORITES_KEY, []),
   }),
 
   mutations: {
