@@ -1,4 +1,8 @@
-# NoirTech – Catálogo de Productos SPA con Vue.js
+# 🖤 NoirTech – Catálogo de Productos SPA con Vue.js
+
+> 🇬🇧 *Product catalog Single Page Application built with Vue 3, Vue Router, Vuex and Vuetify. Consumes a REST API with Axios, includes category filtering, product detail view and favorites, tested with Jest and Cypress.*
+
+🔗 **[Ver demo](https://noirtech-spa.vercel.app)**
 
 Proyecto Front-End desarrollado como **Proyecto Módulo #7 | ABP**.
 
@@ -15,7 +19,7 @@ La aplicación permite visualizar un catálogo de productos, filtrar por categor
 - [Objetivos](#objetivos)
 - [Estructura del Proyecto](#estructura-del-proyecto)
 - [Funcionalidades](#funcionalidades)
-- [Navegación SPA](#navegación-SPA)
+- [Navegación SPA](#navegación-spa)
 - [Testing](#testing)
 - [Cómo ejecutar](#cómo-ejecutar)
 - [Notas](#notas)
@@ -29,6 +33,7 @@ La aplicación permite visualizar un catálogo de productos, filtrar por categor
 - Vuex
 - Vuetify
 - Axios
+- [Platzi Fake Store API](https://fakeapi.platzi.com/) como fuente de productos
 - JavaScript (ES6)
 - HTML5
 - SCSS
@@ -61,7 +66,7 @@ La aplicación permite visualizar un catálogo de productos, filtrar por categor
 
 - Implementar una aplicación Single Page Application (SPA) utilizando Vue.js.
 - Consumir productos desde una API externa.
-  Aplicar arquitectura basada en componentes reutilizables.
+- Aplicar arquitectura basada en componentes reutilizables.
 - Gestionar el estado global mediante Vuex.
 - Implementar navegación entre vistas con Vue Router.
 - Filtrar productos dinámicamente por categoría.
@@ -106,8 +111,7 @@ src/
 │   └── main.scss
 │
 ├── App.vue
-├── main.js
-└── README.md
+└── main.js
 
 tests/
 └── unit/
@@ -117,6 +121,10 @@ tests/
 cypress/
 └── e2e/
     └── catalog-filter.cy.js
+
+evidencias/
+├── evidencia-test-unitarios.png
+└── evidencia-test-e2e-cypress.png
 ```
 
 ---
@@ -189,6 +197,12 @@ Se implementó 1 prueba end-to-end con Cypress:
 
 - Flujo de filtrado de productos por categoría
 
+### Evidencias
+
+| Pruebas unitarias (Jest) | Prueba e2e (Cypress) |
+|--------------------------|----------------------|
+| ![Tests unitarios](evidencias/evidencia-test-unitarios.png) | ![Test e2e con Cypress](evidencias/evidencia-test-e2e-cypress.png) |
+
 ---
 
 ## Cómo ejecutar
@@ -198,10 +212,6 @@ Se implementó 1 prueba end-to-end con Cypress:
 
 ```bash
 npm install
-```
-
-```bash
-npm run dev
 ```
 
 3. Levantar el servidor de desarrollo:
@@ -231,3 +241,7 @@ npx cypress open
 - La interfaz fue diseñada con una estética minimalista en blanco y negro, inspirada en catálogos modernos de e-commerce.
 - Vuetify fue integrado como librería de UI base, combinándose con estilos personalizados en SCSS.
 - La aplicación fue estructurada de forma modular para facilitar futuras mejoras como persistencia de favoritos, paginación o nuevas vistas.
+
+---
+
+👩‍💻 Desarrollado por **Mariangel Colina** · [GitHub](https://github.com/marycolinam) · [LinkedIn](https://www.linkedin.com/in/marycolinam/) · [Portfolio](https://marycodes.vercel.app)
