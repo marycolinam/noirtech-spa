@@ -33,7 +33,7 @@ La aplicación permite visualizar un catálogo de productos, filtrar por categor
 - Vuex
 - Vuetify
 - Axios
-- [Platzi Fake Store API](https://fakeapi.platzi.com/) como fuente de productos
+- [DummyJSON](https://dummyjson.com/docs/products) como fuente de productos (categorías de tecnología)
 - JavaScript (ES6)
 - HTML5
 - SCSS

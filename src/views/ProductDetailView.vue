@@ -40,6 +40,10 @@
       </div>
     </div>
 
+    <div v-else-if="loading" class="feedback-state">
+      <p>Cargando producto...</p>
+    </div>
+
     <div v-else class="feedback-state">
       <p>No se encontró el producto solicitado.</p>
     </div>
@@ -65,7 +69,18 @@ export default {
     };
   },
 
+  created() {
+    // Si se entra directo a la URL del detalle, el catálogo aún no está cargado
+    if (this.$store.getters["products/products"].length === 0) {
+      this.$store.dispatch("products/fetchProducts");
+    }
+  },
+
   computed: {
+    loading() {
+      return this.$store.getters["products/loading"];
+    },
+
     product() {
       return this.$store.getters["products/products"].find(
         (item) => String(item.id) === String(this.id)

@@ -12,7 +12,7 @@ describe("Filtro de catálogo en NoirTech", () => {
       0,
     );
 
-    cy.get("#categoryFilter").select("clothes");
+    cy.get("#categoryFilter").select("laptops");
 
     cy.get(".results-count").should("contain.text", "producto(s)");
     cy.get(".product-card", { timeout: 10000 }).should(
@@ -24,7 +24,7 @@ describe("Filtro de catálogo en NoirTech", () => {
       cy.wrap($el)
         .invoke("text")
         .then((text) => {
-          expect(text.trim().toLowerCase()).to.include("clothes");
+          expect(text.trim().toLowerCase()).to.include("laptops");
         });
     });
 
