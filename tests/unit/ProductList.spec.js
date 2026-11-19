@@ -65,7 +65,7 @@ describe("ProductList.vue", () => {
     });
 
     expect(wrapper.text()).toContain(
-      "No hay productos para la categoría seleccionada.",
+      "No hay productos para la categoría seleccionada."
     );
   });
 });

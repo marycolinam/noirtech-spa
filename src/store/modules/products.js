@@ -22,13 +22,16 @@ export default {
   },
 
   actions: {
-    async fetchProducts({ commit }) {
+    async fetchProducts({ state, commit }) {
+      // Evita volver a pedir el catálogo si ya está cargado
+      if (state.items.length || state.loading) return;
+
       commit("SET_LOADING", true);
       commit("SET_ERROR", null);
 
       try {
         const data = await getProducts();
-        commit("SET_PRODUCTS", data.slice(0, 12));
+        commit("SET_PRODUCTS", data);
       } catch (error) {
         console.error("Error al cargar productos:", error);
         commit("SET_ERROR", "Ups, hubo un problema al cargar el catálogo.");
@@ -48,5 +51,7 @@ export default {
     error(state) {
       return state.error;
     },
+    productById: (state) => (id) =>
+      state.items.find((item) => String(item.id) === String(id)),
   },
 };

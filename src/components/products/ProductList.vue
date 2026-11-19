@@ -9,6 +9,18 @@
     </div>
 
     <div v-if="!loading && !error && products.length" class="catalog-toolbar">
+      <div class="catalog-filter catalog-filter--search">
+        <label for="searchInput" class="filter-label">Buscar</label>
+        <input
+          id="searchInput"
+          type="search"
+          class="filter-select filter-input"
+          placeholder="Nombre, marca o categoría"
+          :value="search"
+          @input="handleSearch"
+        />
+      </div>
+
       <div class="catalog-filter">
         <label for="categoryFilter" class="filter-label">
           Filtrar por categoría
@@ -31,6 +43,24 @@
         </select>
       </div>
 
+      <div class="catalog-filter">
+        <label for="sortSelect" class="filter-label">Ordenar por</label>
+        <select
+          id="sortSelect"
+          :value="sort"
+          class="filter-select"
+          @change="handleSortChange"
+        >
+          <option
+            v-for="option in sortOptions"
+            :key="option.value"
+            :value="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
       <p class="results-count">{{ filteredProducts.length }} producto(s)</p>
     </div>
 
@@ -43,7 +73,13 @@
     </div>
 
     <div v-else-if="filteredProducts.length === 0" class="feedback-state">
-      <p>No hay productos para la categoría seleccionada.</p>
+      <p v-if="search">
+        No encontramos productos para "{{ search }}".
+        <button type="button" class="inline-button" @click="clearFilters">
+          Limpiar filtros
+        </button>
+      </p>
+      <p v-else>No hay productos para la categoría seleccionada.</p>
     </div>
 
     <div v-else class="products-grid">
@@ -58,12 +94,20 @@
 
 <script>
 import ProductCard from "./ProductCard.vue";
+import { SORT_OPTIONS } from "@/store/modules/filters";
+import { formatCategory } from "@/utils/format";
 
 export default {
   name: "ProductList",
 
   components: {
     ProductCard,
+  },
+
+  data() {
+    return {
+      sortOptions: SORT_OPTIONS,
+    };
   },
 
   computed: {
@@ -79,6 +123,12 @@ export default {
     selectedCategory() {
       return this.$store.getters["filters/selectedCategory"];
     },
+    search() {
+      return this.$store.getters["filters/search"];
+    },
+    sort() {
+      return this.$store.getters["filters/sort"] || "relevance";
+    },
     categories() {
       return this.$store.getters.availableCategories;
     },
@@ -88,7 +138,6 @@ export default {
   },
 
   mounted() {
-    this.$store.dispatch("filters/resetCategory");
     this.$store.dispatch("products/fetchProducts");
   },
 
@@ -96,14 +145,16 @@ export default {
     handleCategoryChange(event) {
       this.$store.dispatch("filters/setCategory", event.target.value);
     },
-    formatCategory(category) {
-      if (!category) return "";
-
-      return category
-        .split(" ")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ");
+    handleSearch(event) {
+      this.$store.dispatch("filters/setSearch", event.target.value);
     },
+    handleSortChange(event) {
+      this.$store.dispatch("filters/setSort", event.target.value);
+    },
+    clearFilters() {
+      this.$store.dispatch("filters/resetFilters");
+    },
+    formatCategory,
   },
 };
 </script>

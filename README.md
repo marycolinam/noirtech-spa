@@ -1,6 +1,6 @@
 # 🖤 NoirTech – Catálogo de Productos SPA con Vue.js
 
-> 🇬🇧 *Product catalog Single Page Application built with Vue 3, Vue Router, Vuex and Vuetify. Consumes a REST API with Axios, includes category filtering, product detail view and favorites, tested with Jest and Cypress.*
+> 🇬🇧 *Tech e-commerce Single Page Application built with Vue 3, Vue Router and Vuex. Product search, filters and sorting, detail view with gallery and reviews, favorites, shopping cart persisted in localStorage and a simulated checkout with form validation. Tested with Jest and Cypress.*
 
 🔗 **[Ver demo](https://noirtech-spa.vercel.app)**
 
@@ -8,7 +8,7 @@ Proyecto Front-End desarrollado como **Proyecto Módulo #7 | ABP**.
 
 Esta aplicación web fue creada con el objetivo de practicar el desarrollo de una Single Page Application (SPA) utilizando Vue.js, integrando consumo de API, gestión de estado global con Vuex, navegación con Vue Router y una interfaz visual minimalista inspirada en catálogos modernos de e-commerce.
 
-La aplicación permite visualizar un catálogo de productos, filtrar por categoría, acceder al detalle de cada producto y guardar productos favoritos dentro de una experiencia SPA.
+La aplicación funciona como una tienda online de tecnología: permite buscar, filtrar y ordenar productos, ver el detalle con galería y reseñas, guardar favoritos, administrar un carrito de compras y completar un checkout simulado con confirmación de pedido.
 
 ---
 
@@ -56,6 +56,9 @@ La aplicación permite visualizar un catálogo de productos, filtrar por categor
 - Manejo de eventos
 - Filtrado dinámico por categoría
 - Gestión de favoritos
+- Carrito de compras con persistencia en `localStorage` (plugin de Vuex)
+- Validación de formularios
+- Guards de navegación (no se puede entrar al checkout con el carrito vacío)
 - Organización modular del proyecto
 - Testing unitario y end-to-end
 - Estilos reutilizables y consistentes
@@ -80,32 +83,47 @@ La aplicación permite visualizar un catálogo de productos, filtrar por categor
 
 ```text
 src/
-│
 ├── components/
+│   ├── cart/
+│   │   └── OrderSummary.vue        # Resumen de subtotal, envío y total
 │   ├── layout/
-│   │   ├── AppHeader.vue
+│   │   ├── AppHeader.vue           # Navegación con contador de favoritos y carrito
 │   │   └── AppFooter.vue
-│   │
-│   └── products/
-│       ├── ProductCard.vue
-│       └── ProductList.vue
+│   ├── products/
+│   │   ├── ProductCard.vue
+│   │   └── ProductList.vue         # Búsqueda, filtro y orden
+│   └── shop/
+│       ├── PriceTag.vue            # Precio final, original y descuento
+│       ├── QuantitySelector.vue
+│       └── RatingStars.vue
 │
 ├── views/
 │   ├── HomeView.vue
-│   └── ProductDetailView.vue
+│   ├── ProductDetailView.vue
+│   ├── FavoritesView.vue
+│   ├── CartView.vue
+│   ├── CheckoutView.vue
+│   └── OrderConfirmationView.vue
 │
 ├── router/
 │   └── index.js
 │
 ├── services/
-│   └── productService.js
+│   └── productService.js           # Consumo de DummyJSON con Axios
 │
 ├── store/
-│   ├── index.js
+│   ├── index.js                    # Getters globales y plugin de persistencia
 │   └── modules/
 │       ├── products.js
-│       ├── filters.js
-│       └── favorites.js
+│       ├── filters.js              # Categoría, búsqueda y orden
+│       ├── favorites.js
+│       ├── cart.js
+│       ├── orders.js
+│       └── ui.js                   # Avisos (toast)
+│
+├── utils/
+│   ├── format.js                   # Precios, descuentos y categorías
+│   └── storage.js                  # Lectura y escritura segura en localStorage
 │
 ├── styles/
 │   └── main.scss
@@ -116,7 +134,9 @@ src/
 tests/
 └── unit/
     ├── ProductCard.spec.js
-    └── ProductList.spec.js
+    ├── ProductList.spec.js
+    ├── cart.spec.js
+    └── filters.spec.js
 
 cypress/
 └── e2e/
@@ -133,31 +153,36 @@ evidencias/
 
 1. Catálogo de productos
 
-La aplicación permite visualizar un catálogo de productos obtenido desde una API externa.
+Productos de tecnología (smartphones, laptops, tablets y accesorios) obtenidos desde DummyJSON. Cada tarjeta muestra imagen, categoría y marca, valoración, precio con descuento, aviso de pocas unidades y botón para agregar al carrito.
 
-Cada producto muestra:
+2. Búsqueda, filtro y orden
 
-- Imagen
-- Categoría
-- Título
-- Descripción breve
-- Precio
-
-2. Filtro por categoría
-
-La aplicación permite filtrar los productos según su categoría mediante un selector dinámico.
+- Búsqueda por nombre, marca o categoría (ignora mayúsculas y tildes).
+- Filtro por categoría.
+- Orden por relevancia, precio, valoración o nombre.
 
 3. Detalle de producto
 
-Cada producto cuenta con una vista de detalle accesible desde la grilla principal.
+Galería de imágenes, valoración, stock disponible, selector de cantidad, información de envío, garantía y devoluciones, reseñas de clientes y productos relacionados.
 
 4. Favoritos
 
-Cada producto puede marcarse como favorito.
+Cada producto se puede guardar como favorito. Los favoritos se guardan en el navegador y tienen su propia vista.
 
-5. Estados de interfaz
+5. Carrito de compras
 
-La aplicación contempla distintos estados de carga y visualización.
+- Agregar productos desde el catálogo o el detalle.
+- Cambiar cantidades (sin superar el stock) y eliminar productos.
+- Subtotal, costo de envío y total. El envío es gratis sobre US$500.
+- El carrito se mantiene al recargar la página.
+
+6. Checkout simulado
+
+Formulario con datos de contacto, dirección de envío (regiones de Chile) y método de pago, con validación por campo. Al confirmar se genera un número de pedido y se muestra una pantalla de confirmación. No se realizan cobros reales ni se piden datos de tarjeta.
+
+7. Estados de interfaz
+
+Estados de carga, error, catálogo vacío, búsqueda sin resultados, carrito vacío y avisos al agregar productos.
 
 ---
 
@@ -165,17 +190,13 @@ La aplicación contempla distintos estados de carga y visualización.
 
 La aplicación utiliza Vue Router para manejar la navegación entre vistas sin recargar la página.
 
-Las rutas principales son:
-
 ```text
-/              → Catálogo principal
-/producto/:id  → Detalle del producto
-```
-
-El router se integra en la aplicación mediante:
-
-```vue
-<router-view />
+/                    → Catálogo principal
+/producto/:id        → Detalle del producto
+/favoritos           → Productos favoritos
+/carrito             → Carrito de compras
+/checkout            → Checkout (requiere productos en el carrito)
+/pedido-confirmado   → Confirmación del pedido
 ```
 
 ---
@@ -186,10 +207,12 @@ El proyecto incluye pruebas automatizadas para validar el comportamiento princip
 
 - Pruebas unitarias
 
-Se implementaron 2 pruebas unitarias con Jest y Vue Test Utils:
+Se implementaron 10 pruebas unitarias con Jest y Vue Test Utils:
 
 - Renderizado básico del componente ProductCard
 - Visualización del estado vacío en ProductList
+- Carrito: precio con descuento, suma de cantidades, límite de stock, costo de envío, eliminar y vaciar, aviso al agregar
+- Catálogo: búsqueda, combinación de filtros y orden por precio y valoración
 
 - Prueba e2e
 
@@ -237,10 +260,11 @@ npx cypress open
 ## Notas
 
 - El proyecto fue desarrollado con enfoque SPA utilizando Vue.js 3 y Vue CLI.
-- Se utilizó Vuex para centralizar el manejo de productos, filtros y favoritos.
+- Se utilizó Vuex para centralizar el manejo de productos, filtros, favoritos, carrito y pedidos.
 - La interfaz fue diseñada con una estética minimalista en blanco y negro, inspirada en catálogos modernos de e-commerce.
 - Vuetify fue integrado como librería de UI base, combinándose con estilos personalizados en SCSS.
-- La aplicación fue estructurada de forma modular para facilitar futuras mejoras como persistencia de favoritos, paginación o nuevas vistas.
+- El carrito, los favoritos y el último pedido se guardan en `localStorage` mediante un plugin de Vuex.
+- La aplicación fue estructurada de forma modular para facilitar futuras mejoras como paginación, cuentas de usuario o un backend real.
 
 ---
 
